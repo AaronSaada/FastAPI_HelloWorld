@@ -1,0 +1,36 @@
+---
+- name: Déploiement FastAPI sur EC2 Ubuntu
+  hosts: fastapi
+  become: yes
+
+  tasks:
+    - name: Mise à jour APT
+      apt:
+        update_cache: yes
+
+    - name: Installer Docker et Git
+      apt:
+        name:
+          - docker.io
+          - git
+        state: present
+
+    - name: Installer docker-compose (si absent)
+      shell: |
+        if ! command -v docker-compose &> /dev/null; then
+          curl -L "https://github.com/docker/compose/releases/download/v2.24.7/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          chmod +x /usr/local/bin/docker-compose
+        fi
+
+    - name: Cloner ou mettre à jour le projet
+      git:
+        repo: 'https://github.com/AaronSaada/fastapi_helloworld.git'
+        dest: /opt/fastapi_helloworld
+        version: main
+        force: yes
+
+    - name: Démarrer le conteneur
+      shell: |
+        cd /opt/fastapi_helloworld
+        docker-compose down || true
+        docker-compose up -d --build
