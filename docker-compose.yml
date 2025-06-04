@@ -1,13 +1,26 @@
 version: "3.8"
 
 services:
+  traefik:
+    image: traefik:v2.11
+    container_name: traefik
+    command:
+      - "--api.insecure=true"
+      - "--api.dashboard=true"
+      - "--entrypoints.web.address=:80"
+      - "--providers.docker=true"
+    ports:
+      - "80:80"
+      - "8081:8080"  # dashboard accessible sur port 8081
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
   fastapi-app:
     build: .
     container_name: fastapi-container
-    ports:
-      - "8000:8000"
-    volumes:
-      - .:/app
-    environment:
-      - PYTHONUNBUFFERED=1
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.fastapi.rule=PathPrefix(`/`)"
+      - "traefik.http.services.fastapi.loadbalancer.server.port=8000"
+    expose:
+      - "8000"
