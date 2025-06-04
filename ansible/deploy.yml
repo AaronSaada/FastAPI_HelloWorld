@@ -25,12 +25,12 @@
     - name: Cloner ou mettre à jour le projet
       git:
         repo: 'https://github.com/AaronSaada/fastapi_helloworld.git'
-        dest: /opt/fastapi_helloworld
+        dest: /fastapi_helloworld
         version: main
         force: yes
 
     - name: Démarrer le conteneur
       shell: |
-        cd /opt/fastapi_helloworld
+        cd /fastapi_helloworld
         docker-compose down || true
         docker-compose up -d --build

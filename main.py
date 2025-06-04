@@ -9,5 +9,3 @@ def read_root():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="localhost", port=8000)
-
-alert("FastAPI server is running at http://localhost:8000")
